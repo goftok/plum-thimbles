@@ -1,2 +1,6 @@
-# hackathon4
-Project for ONCHAIN SUMMER BUILDATHON
+```
+npm install
+npm run dev
+```
+
+Head to http://localhost:5173/api
