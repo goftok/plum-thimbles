@@ -10,6 +10,8 @@ import { handle } from 'frog/vercel'
 //   runtime: 'edge',
 // }
 
+// const ZERO_TOKEN_ADDRESS = '0x12aa2d8ebd0b0886aeb89d7b824321f0cbccb160'; // Replace with your $ZERO token address
+
 export const app = new Frog({
   assetsPath: '/',
   basePath: '/api',
@@ -57,20 +59,29 @@ export const generateImageComponent = (text: string) => {
 };
 
 app.frame('/', (c) => {
-  const userId = 'someUserId';
-  tokenStore[userId] = tokenStore[userId] ?? 10;
-  const hello_message = `Welcome to the Plum thimbles game!\nYour current balance is ${tokenStore[userId]} $PLUM`;
-  console.log(tokenStore[userId])
+  const hello_message = `Welcome to the Plum thimbles game! Use your 1 $PLUM to play a game.`;
 
   return c.res({
     action: '/mixing',
     image: generateImageComponent(hello_message),
     intents: [
       <Button value='start' >Play</Button>,
+      // <Button.Transaction target="/verify-balance">Verify Balance</Button.Transaction>,
       <Button.Redirect location="/docs">Rules</Button.Redirect>
     ]
   });
 });
+
+// app.transaction('/verify-balance', (c) => {
+//   console.log(c.address)
+//   return c.contract({
+//     abi,
+//     chainId: 'eip155:8453',
+//     functionName: 'balanceOf',
+//     args: [c.address],
+//     to: "0x12aa2d8ebd0b0886aeb89d7b824321f0cbccb160",
+//   })
+// });
 
 
 app.frame('/mixing', (c) => {
@@ -92,12 +103,26 @@ app.frame('/choose-thimble', (c) => {
     action: '/result-thimble',
     image: generateImageComponent(resultMessage),
     intents: [
-      <Button value="1">1</Button>,
-      <Button value="2">2</Button>,
-      <Button value="3">3</Button>,
+      <Button value='1'>1</Button>,
+      <Button value='2'>2</Button>,
+      <Button value='3'>3</Button>
+      // <Button.Transaction target="/choose/1">1</Button.Transaction>,
+      // <Button.Transaction target="/choose/2">2</Button.Transaction>,
+      // <Button.Transaction target="/choose/3">3</Button.Transaction>,
     ],
   });
 });
+
+// app.transaction('/choose/:number', (c) => {
+//   const number = c.req.param('number')
+//   const winningButton = Math.floor(Math.random() * 3) + 1;
+
+//   // if buttonValue?.toString() == winningButton.toString() then send 2 $ZERO to user
+//   // if not take 1 $ZERO from user
+//   return c.contract({
+
+//   })
+// });
 
 
 app.frame('/result-thimble', (c) => {
