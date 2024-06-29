@@ -4,7 +4,7 @@ import { serveStatic } from 'frog/serve-static'
 // import { neynar } from 'frog/hubs'
 import { handle } from 'frog/vercel'
 import { createSystem } from 'frog/ui'
-import { generateImageComponent } from './utils'
+import { generateImageComponent } from './utils.tsx'
 
 
 // Uncomment to use Edge Runtime.
