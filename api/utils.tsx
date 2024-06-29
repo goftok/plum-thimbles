@@ -15,10 +15,12 @@ export const generateImageComponent = (text: string) => {
             <div
                 style={{
                     color: 'white',
-                    fontSize: 60,
+                    fontSize: 30,
                     letterSpacing: '-0.025em',
                     lineHeight: 1.4,
                     marginTop: 30,
+                    marginLeft: 200,
+                    marginRight: 200,
                     padding: '0 120px',
                     whiteSpace: 'pre-wrap',
                 }}
@@ -28,23 +30,3 @@ export const generateImageComponent = (text: string) => {
         </div>
     );
 };
-
-export const abi = [
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "name": "_owner",
-                "type": "address"
-            }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-            {
-                "name": "balance",
-                "type": "uint256"
-            }
-        ],
-        "type": "function"
-    }
-];
