@@ -3,6 +3,7 @@ import { devtools } from 'frog/dev'
 import { serveStatic } from 'frog/serve-static'
 // import { neynar } from 'frog/hubs'
 import { handle } from 'frog/vercel'
+import { createSystem } from 'frog/ui'
 
 
 // Uncomment to use Edge Runtime.
@@ -16,10 +17,12 @@ export const app = new Frog({
   assetsPath: '/',
   basePath: '/api',
   browserLocation: '/:path',
+  imageAspectRatio: '1:1'
   // Supply a Hub to enable frame verification.
   // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
 
+const { Image, Heading } = createSystem()
 
 interface TokenStore {
   [key: string]: number;
@@ -58,6 +61,7 @@ export const generateImageComponent = (text: string) => {
   );
 };
 
+
 app.frame('/', (c) => {
   const hello_message = `Welcome to the Plum thimbles game! Use your 1 $PLUM to play a game.`;
 
@@ -85,11 +89,9 @@ app.frame('/', (c) => {
 
 
 app.frame('/mixing', (c) => {
-  const mixing_message = "/mixing gif with thimbles/";
-
   return c.res({
     action: '/choose-thimble',
-    image: generateImageComponent(mixing_message),
+    image: '/thimbles.gif',
     intents: [
       <Button value='stop'>Press to stop mixing thimbles</Button>,
     ]
@@ -98,14 +100,13 @@ app.frame('/mixing', (c) => {
 
 
 app.frame('/choose-thimble', (c) => {
-  let resultMessage = '/image of the thimbles/\nChoose a number: 1, 2, or 3. If you win, you get 2 tokens. If you lose, you lose 1 token.';
   return c.res({
     action: '/result-thimble',
-    image: generateImageComponent(resultMessage),
+    image: '/thimbles_all.jpg',
     intents: [
       <Button value='1'>1</Button>,
       <Button value='2'>2</Button>,
-      <Button value='3'>3</Button>
+      <Button value='3'>3</Button>,
       // <Button.Transaction target="/choose/1">1</Button.Transaction>,
       // <Button.Transaction target="/choose/2">2</Button.Transaction>,
       // <Button.Transaction target="/choose/3">3</Button.Transaction>,
@@ -124,32 +125,34 @@ app.frame('/choose-thimble', (c) => {
 //   })
 // });
 
+function generateThimblesImage(buttonValue: String, isWin: boolean) {
+  const winPrefix = isWin ? 'thimbles_win_' : 'thimbles_nowin_';
+  const imageSrc = `/${winPrefix}${buttonValue}.jpg`;
 
+  return <Image src={imageSrc} objectFit="contain" height="256" width="256" />
+
+}
 app.frame('/result-thimble', (c) => {
   const { buttonValue } = c;
-  const userId = 'someUserId';
 
-  const winningButton = Math.floor(Math.random() * 3) + 1;
-
-  let resultMessage = '/opening one thimble/\n'
-
-  if (buttonValue?.toString() == winningButton.toString()) {
-    tokenStore[userId] += 2;
-    resultMessage += `You win! Your tokens: ${tokenStore[userId]}`;
-  } else {
-    tokenStore[userId] -= 1;
-    resultMessage += `You lose. Your tokens: ${tokenStore[userId]}`;
+  if (!buttonValue) {
+    throw new Error('Invalid button value');
   }
 
+  const winningButton = Math.floor(Math.random() * 3) + 1;
+  const isWin = buttonValue?.toString() == winningButton.toString()
+
   return c.res({
-    action: '/choose-thimble',
-    image: generateImageComponent(resultMessage),
+    action: '/mixing',
+    imageOptions: { width: 1024, height: 1024 },
+    image: generateThimblesImage(buttonValue, isWin),
     intents: [
       <Button value="play-again"> Play Again</Button>,
       <Button.Reset>Return</Button.Reset>
     ],
   });
 });
+
 
 
 // @ts-ignore
