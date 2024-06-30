@@ -8,12 +8,15 @@
     "deploy": "vercel"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "frog": "latest",
     "hono": "^4"
   },
   "devDependencies": {
+    "ethers": "^6.13.1",
+    "ts-node": "^10.9.2",
     "tsx": "^4.7.1",
-    "typescript": "^5.3.3",
+    "typescript": "^5.5.2",
     "vercel": "^34.2.7"
   }
 }
