@@ -109,7 +109,8 @@ export const app = new Frog({
   assetsPath: '/',
   basePath: '/api',
   browserLocation: '/:path',
-  imageAspectRatio: '1:1'
+  imageAspectRatio: '1:1',
+  title: 'Plum Thimbles',
   // Supply a Hub to enable frame verification.
   // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
@@ -164,17 +165,6 @@ app.frame('/', (c) => {
   });
 });
 
-// app.transaction('/verify-balance', (c) => {
-//   console.log(c.address)
-//   return c.contract({
-//     abi,
-//     chainId: 'eip155:8453',
-//     functionName: 'balanceOf',
-//     args: [c.address],
-//     to: "0x12aa2d8ebd0b0886aeb89d7b824321f0cbccb160",
-//   })
-// });
-
 
 app.frame('/mixing', (c) => {
   return c.res({
@@ -189,7 +179,7 @@ app.frame('/mixing', (c) => {
 
 app.frame('/choose-thimble', (c) => {
   return c.res({
-    action: '/result-thimble',
+    action: '/wait-results',
     image: '/thimbles_all.jpg',
     intents: [
       <Button.Transaction target="/play-game">1</Button.Transaction>,
@@ -208,7 +198,6 @@ app.transaction('/play-game', async (c) => {
     to: contractAddress,
     value: BigInt(100000000000000)
   });
-
 });
 
 function generateThimblesImage(buttonValue: String, isWin: boolean) {
@@ -253,9 +242,22 @@ async function getGameResult(txHash: string): Promise<{ won: boolean, amountWon:
   }
 }
 
-// App frame handling function
-app.frame('/result-thimble', async (c: AppContext) => {
+app.frame('/wait-results', (c) => {
   const { buttonIndex, transactionId } = c;
+
+  return c.res({
+    action: `/result-thimble/${buttonIndex}/${transactionId}`,
+    image: '/thimbles_all.jpg',
+    intents: [
+      <Button>Wait 5 seconds for the result</Button>,
+    ]
+  });
+});
+
+// App frame handling function
+app.frame('/result-thimble/:buttonIndex/:transactionId', async (c) => {
+  const buttonIndex = c.req.param('buttonIndex');
+  const transactionId = c.req.param('transactionId');
 
   if (!buttonIndex) {
     throw new Error('Invalid button value');
@@ -275,7 +277,7 @@ app.frame('/result-thimble', async (c: AppContext) => {
 
     const { won, amountWon } = gameResult;
     const message = won
-      ? `You won ${ethers.formatEther(amountWon)} ETH. Play again?`
+      ? `You won 0.0002 ETH. Play again?`
       : `You lose 0.0001 ETH. Play again?`;
 
     return c.res({
