@@ -159,7 +159,6 @@ app.frame('/', (c) => {
     image: generateImageComponent(hello_message),
     intents: [
       <Button value='start' >Play</Button>,
-      <Button.Redirect location="/docs">Rules</Button.Redirect>
       // <Button.Transaction target="/verify-balance">Verify Balance</Button.Transaction>,
     ]
   });
